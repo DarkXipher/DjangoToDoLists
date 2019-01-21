@@ -4,9 +4,9 @@ from selenium.common.exceptions import WebDriverException
 from django.test import LiveServerTestCase
 import time
 
-class NewVisitorTest(LiveServerTestCase):
+MAX_WAIT = 10
 
-    MAX_WAIT = 10
+class NewVisitorTest(LiveServerTestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -64,7 +64,7 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Buy peacock feathers')
         inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1:Buy peacock feathers')
+        self.wait_for_row_in_list_table('1: Buy peacock feathers')
 
         #should be a unique url for user edith
         edith_list_url = self.browser.current_url
