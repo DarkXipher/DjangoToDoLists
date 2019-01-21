@@ -21,22 +21,22 @@ class NewVisitorTest(unittest.TestCase):
 
         #Invited to enter a to-do item immediately
         inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertEqual( inputbox.get_attributej('placeholder'), 'Enter a to-do item')
+        self.assertEqual( inputbox.get_attribute('placeholder'), 'Enter a to-do item')
 
         #User types to-do item immediately, such as cleaning the dishes
         inputbox.send_keys('Clean the Dishes')
 
         #when user presses enter, page updates and the page lists
         # "1: Clean the Dishes" as an item in a to-do list
-        inputbox.send_keys(Keys.Enter)
+        inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
 
         #There is still a text box inviting to add additional items
         #enters "Purchase Airline tickets"
         table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_element_by_tag_name('tr')
+        rows = table.find_elements_by_tag_name('tr')
         self.assertTrue(
-            any(row.text == '1: Clean the Dishes' for row in rows)
+            any(row.text == '1: Clean the Dishes' for row in rows), "New to-do item did not appear in table"
         )
 
         #The page updates again, and now shows both items
