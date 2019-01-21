@@ -1,5 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
+import time
 
 class NewVisitorTest(unittest.TestCase):
     def setUp(self):
@@ -14,19 +16,31 @@ class NewVisitorTest(unittest.TestCase):
 
         #notice that the title of the page mention to-do lists
         self.assertIn('To-Do', self.browser.title)
-        self.fail("Finish the test!")
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
 
         #Invited to enter a to-do item immediately
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual( inputbox.get_attributej('placeholder'), 'Enter a to-do item')
 
         #User types to-do item immediately, such as cleaning the dishes
+        inputbox.send_keys('Clean the Dishes')
 
         #when user presses enter, page updates and the page lists
         # "1: Clean the Dishes" as an item in a to-do list
+        inputbox.send_keys(Keys.Enter)
+        time.sleep(1)
 
         #There is still a text box inviting to add additional items
         #enters "Purchase Airline tickets"
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_element_by_tag_name('tr')
+        self.assertTrue(
+            any(row.text == '1: Clean the Dishes' for row in rows)
+        )
 
         #The page updates again, and now shows both items
+        self.fail("Finish the test!")
 
         #Site should generate a unique URL, some explanation is needed
 
