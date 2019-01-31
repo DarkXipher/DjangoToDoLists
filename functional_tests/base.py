@@ -1,8 +1,12 @@
 from selenium import webdriver
 from selenium.common.exceptions import WebDriverException
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.keys import Keys
 # from .server_tools import reset_database
+from .server_tools import create_session_on_server
+from .management.commands.create_session import create_pre_authenticated_session
+
 from datetime import datetime
 import time
 import os
@@ -68,7 +72,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def _test_has_failed(self):
         #slightly obscure but couldn't fina  better way!
         return any(error for (method, error) in self._outcome.errors)
-        
+
     @wait
     def wait_for(self, fn):
         return fn()
@@ -100,3 +104,17 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.get_item_input_box().send_keys(Keys.ENTER)
         item_number = num_rows + 1
         self.wait_for_row_in_list_table(f'{item_number}: {item_text}')
+
+    def create_pre_authenticated_session(self, email):
+        if self.staging_server:
+            session_key = create_session_on_server(self.staging_server, email)
+        else:
+            session_key = create_pre_authenticated_session(email)
+        ## to set a cookie we need to first visit the domain.
+        ## 404 pages load the quickest!
+        self.browser.get(self.live_server_url + "/404_no_such_url/")
+        self.browser.add_cookie(dict(
+            name=settings.SESSION_COOKIE_NAME,
+            value=session_key,
+            path='/',
+        ))
