@@ -3,10 +3,13 @@ from selenium.common.exceptions import WebDriverException
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.keys import Keys
 # from .server_tools import reset_database
+from datetime import datetime
 import time
 import os
 
 MAX_WAIT = 10
+
+SCREEN_DUMP_LOCATION = os.path.join( os.path.dirname(os.path.abspath(__file__)), 'screendumps')
 
 def wait(fn):
     def modified_fn(*args, **kwargs):
@@ -29,9 +32,43 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.live_server_url = 'http://' + self.staging_server
             # reset_database(self.staging_server)
     
-    def tearDown(self):
-        self.browser.quit()
+    def _get_filename(self):
+        timestamp = datetime.now().isoformat().replace(':', '.')[:19]
+        return '{folder}/{classname}.{method}-window{windowid}-{timestamp}'.format(
+            folder=SCREEN_DUMP_LOCATION,
+            classname=self.__class__.__name__,
+            method=self._testMethodName,
+            windowid=self._windowid,
+            timestamp=timestamp
+        )
 
+    def take_screenshot(self):
+        filename = self._get_filename() + '.png'
+        print('schreenshotting to', filename)
+        self.browser.get_screenshot_as_file(filename)
+
+    def dump_html(self):
+        filename = self._get_filename() + '.html'
+        print('dumping page HTML to', filename)
+        with open(filename, 'w') as f:
+            f.write(self.browser.page_source)
+
+    def tearDown(self):
+        if self._test_has_failed():
+            if not os.path.exists(SCREEN_DUMP_LOCATION):
+                os.makedirs(SCREEN_DUMP_LOCATION)
+            for ix, handle in enumerate(self.browser.window_handles):
+                self._windowid = ix
+                self.browser.switch_to_window(handle)
+                self.take_screenshot()
+                self.dump_html()
+        self.browser.quit()
+        super().tearDown()
+
+    def _test_has_failed(self):
+        #slightly obscure but couldn't fina  better way!
+        return any(error for (method, error) in self._outcome.errors)
+        
     @wait
     def wait_for(self, fn):
         return fn()
