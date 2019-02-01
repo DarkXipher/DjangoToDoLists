@@ -6,10 +6,8 @@ class ListPage(object):
     def __init__(self, test):
         self.test = test
 
-
     def get_table_rows(self):
         return self.test.browser.find_elements_by_css_selector('#id_list_table tr')
-
 
     @wait
     def wait_for_row_in_list_table(self, item_text, item_number):
@@ -30,7 +28,7 @@ class ListPage(object):
         return self
 
     def get_share_box(self):
-        return self.test.browser.find_element_by_css_selector('input[name=sharee"]')
+        return self.test.browser.find_element_by_css_selector('input[name="sharee"]')
 
     def get_shared_with_list(self):
         return self.test.browser.find_elements_by_css_selector('.list-sharee')

@@ -1,5 +1,4 @@
-"""superlists URL Configuration
-
+"""
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.11/topics/http/urls/
 Examples:
@@ -13,15 +12,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
-from lists import views as list_views
-from lists import urls as list_urls
-from accounts import urls as account_urls
-from lists import api_urls
+
+from django.conf.urls import url
+from lists import api
 
 urlpatterns = [
-    url(r'^$', list_views.home_page, name='home'),
-    url(r'^lists/', include(list_urls)),
-    url(r'^accounts/', include(account_urls)),
-    url(r'^api/', include(api_urls)), 
+    url(r'^lists/(\d+)/$', api.list, name='api_list')
 ]
