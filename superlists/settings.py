@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'lists',
     'accounts',
     'functional_tests',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
