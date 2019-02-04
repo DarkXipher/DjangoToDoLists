@@ -1,8 +1,9 @@
 import json
 from django.http import HttpResponse
 from lists.models import List, Item
-from lists.forms import ExistingListItemForm, EMPTY_ITEM_ERROR
+from lists.forms import ExistingListItemForm, EMPTY_ITEM_ERROR, DUPLICATE_ITEM_ERROR
 from rest_framework import routers, serializers, viewsets
+from rest_framework.validators import UniqueTogetherValidator
 
 def list(request, list_id):
     list_ = List.objects.get(id=list_id)
@@ -25,20 +26,20 @@ def list(request, list_id):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    # text = serializers.CharField(
-    #     allow_blank=False, error_messages={'blank': EMPTY_ITEM_ERROR}
-    # )
+    text = serializers.CharField(
+        allow_blank=False, error_messages={'blank': EMPTY_ITEM_ERROR}
+    )
 
     class Meta:
         model = Item
         fields = ('id', 'list', 'text')
-        # validators = [
-        #     UniqueTogetherValidator(
-        #         queryset=Item.objects.all(),
-        #         fields=('list', 'text'),
-        #         message=DUPLICATE_ITEM_ERROR
-        #     )
-        # ]
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Item.objects.all(),
+                fields=('list', 'text'),
+                message=DUPLICATE_ITEM_ERROR
+            )
+        ]
 
 class ListSerializer(serializers.ModelSerializer):
     items = ItemSerializer(many=True, source='item_set')
