@@ -1,9 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 User = get_user_model()
-from lists.models import Item, List
+from lists.models import List
 from lists.forms import ItemForm, ExistingListItemForm, NewListForm
 
 def home_page(request):

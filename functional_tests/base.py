@@ -5,6 +5,7 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.webdriver.common.keys import Keys
 # from .server_tools import reset_database
 from .server_tools import create_session_on_server
+from .server_tools import reset_database
 from .management.commands.create_session import create_pre_authenticated_session
 
 from datetime import datetime
@@ -34,7 +35,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.staging_server = os.environ.get('STAGING_SERVER')
         if self.staging_server:
             self.live_server_url = 'http://' + self.staging_server
-            # reset_database(self.staging_server)
+            reset_database(self.staging_server)
     
     def _get_filename(self):
         timestamp = datetime.now().isoformat().replace(':', '.')[:19]
